@@ -67,7 +67,9 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return False
         print(instance.id)
-        instance.save()
+        from models import storage
+        storage.new(instance)
+        storage.save()
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
