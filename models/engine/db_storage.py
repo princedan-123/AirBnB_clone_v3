@@ -43,13 +43,27 @@ class DBStorage:
     def all(self, cls=None):
         """query on the current database session"""
         new_dict = {}
-        for clss in classes:
-            if cls is None or cls is classes[clss] or cls is clss:
-                objs = self.__session.query(classes[clss]).all()
-                for obj in objs:
-                    key = obj.__class__.__name__ + '.' + obj.id
-                    new_dict[key] = obj
-        return (new_dict)
+        if cls is not None:
+            dict_obj = {}
+            result = self.__session.query(cls).all()
+            for obj in result:
+                key = "{}.{}".format(obj.__class__.__name__, obj.id)
+                dict_obj[key] = obj
+            return dict_obj
+        if cls is None:
+            from models.city import City
+            from models.amenity import Amenity
+            from models.place import Place
+            from models.review import Review
+            from models.user import User
+            classes = [State, City, Amenity, Place, Review, User]
+            dict_obj = {}
+            for c in classes:
+                result = self.__session.query(c).all()
+                for obj in result:
+                    key = "{}.{}".format(obj.__class__.__name__, obj.id)
+                    dict_obj[key] = obj
+            return dict_obj
 
     def new(self, obj):
         """add the object to the current database session"""
@@ -74,3 +88,25 @@ class DBStorage:
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
+
+    def get(self, cls, id):
+        """A method to retrieve one object."""
+        if cls is not None and id is not None:
+            return self.__session.query(cls).filter_by(id=id).first()
+        else:
+            return None
+
+
+    def count(self, cls=None):
+        """A method to count the number of objects in storage."""
+        obj = self.all()
+        count = 0
+        if cls is not None:
+            for item in obj.values():
+                if item.__class__.__name__ == cls:
+                    count += 1
+            return count
+        else:
+            for item in obj.values():
+                count += 1
+            return count
