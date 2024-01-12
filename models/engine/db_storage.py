@@ -42,7 +42,6 @@ class DBStorage:
 
     def all(self, cls=None):
         """query on the current database session"""
-        new_dict = {}
         if cls is not None:
             dict_obj = {}
             result = self.__session.query(cls).all()
@@ -91,11 +90,9 @@ class DBStorage:
 
     def get(self, cls, id):
         """A method to retrieve one object."""
-        if cls is not None and id is not None:
-            return self.__session.query(cls).filter_by(id=id).first()
-        else:
-            return None
-
+        obj = self.all(cls)
+        key = f"{cls}.{id}"
+        return obj.get(key, None)
 
     def count(self, cls=None):
         """A method to count the number of objects in storage."""
